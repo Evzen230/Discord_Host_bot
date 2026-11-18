@@ -1,0 +1,23 @@
+name: botdeck-bots
+services:
+  example:
+    build: .
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN:?Set DISCORD_TOKEN in examples/python-bot/.env}
+    labels:
+      cz.botdeck.managed: "true"
+      cz.botdeck.bot-id: example
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 100
+    mem_limit: 256m
+    cpus: 0.50
+    tmpfs: [/tmp:size=16m,mode=1777]
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"

@@ -1,0 +1,66 @@
+name: botdeck
+
+x-limits: &limits
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 100
+  tmpfs: [/tmp:size=16m,mode=1777]
+  logging:
+    driver: json-file
+    options:
+      max-size: 5m
+      max-file: "2"
+
+services:
+  dashboard:
+    <<: *limits
+    build: .
+    image: botdeck:local
+    environment:
+      BOTDECK_USER: ${BOTDECK_USER:-admin}
+      BOTDECK_PASSWORD: ${BOTDECK_PASSWORD:?Set BOTDECK_PASSWORD in .env}
+      BOTDECK_AGENT_TOKEN: ${BOTDECK_AGENT_TOKEN:?Set BOTDECK_AGENT_TOKEN in .env}
+      BOTDECK_AGENT_URL: http://agent:8081
+    ports:
+      - "127.0.0.1:${BOTDECK_PORT:-8095}:8080"
+    networks: [control]
+    mem_limit: 192m
+    cpus: 0.50
+    depends_on:
+      agent:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  agent:
+    <<: *limits
+    build: .
+    image: botdeck:local
+    # Only this internal service has access to the Docker socket.
+    user: "0:0"
+    command: [uvicorn, botdeck.agent:app, --host, 0.0.0.0, --port, "8081", --no-proxy-headers]
+    environment:
+      BOTDECK_AGENT_TOKEN: ${BOTDECK_AGENT_TOKEN:?Set BOTDECK_AGENT_TOKEN in .env}
+      BOTDECK_CONFIG: /config/bots.json
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config:/config:ro
+      - /proc:/host/proc:ro
+    networks: [control]
+    mem_limit: 192m
+    cpus: 0.50
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  control:
+    internal: true
+

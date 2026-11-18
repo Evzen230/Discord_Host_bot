@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BotDeck • Správa Discord botů</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/">▦ <span>BotDeck<span class="brand-dot">.</span></span></a>
+    <div class="workspace">OSOBNÍ WORKSPACE</div>
+    <a class="nav active" href="#bots">◈ <span>Přehled botů</span></a>
+    <div class="sidebar-bottom"><span class="led"></span> Soukromá správa <small>Raspberry Pi · Docker</small></div>
+  </aside>
+  <main>
+    <header><span>WORKSPACE <span class="slash">/</span> Přehled</span><span class="private">◉ Osobní panel</span></header>
+    <section class="heading"><div><p class="eyebrow">VŠE POD KONTROLOU</p><h1>Tvoji boti. Jeden přehled.</h1><p class="muted">Sleduj provoz, prohlížej logy a spravuj své Discord boty.</p></div><button id="refresh">↻ Obnovit</button></section>
+    <div id="error" class="error" role="alert" hidden></div>
+    <section class="metrics" aria-label="Souhrn provozu">
+      <article class="metric"><span>Spuštěné kontejnery</span><strong id="running">—</strong><small id="total">Načítám boty…</small></article>
+      <article class="metric"><span>RAM botů</span><strong id="bot-memory">—</strong><small>Součet dostupných měření</small></article>
+      <article class="metric"><span>RAM maliny</span><strong id="host-memory">—</strong><small id="host-total">Celková spotřeba hostitele</small></article>
+      <article class="metric"><span>Zátěž systému</span><strong id="host-load">—</strong><small>Průměr za poslední minutu</small></article>
+    </section>
+    <section id="bots"><div class="section-title"><h2>Moji boti <span id="count" class="count">0</span></h2><span id="updated" class="muted">Čekám na první aktualizaci</span></div>
+      <div id="bot-list" class="bot-grid" aria-live="polite"></div>
+      <div id="empty" class="empty" hidden><div class="empty-icon">◈</div><h2>Místo pro tvého prvního bota</h2><p>Přidej bota do <code>config/bots.json</code> a nasaď jeho kontejner podle návodu v README.</p><p>Pak se zde objeví jeho stav, spotřeba a ovládání.</p></div>
+    </section>
+    <footer><span>Automatická aktualizace každých 15 sekund</span><span>BotDeck / Raspberry Pi 4</span></footer>
+  </main>
+  <dialog id="logs-dialog"><div class="dialog-heading"><h2 id="logs-title">Logy</h2><div><button id="reload-logs">↻ Obnovit</button> <button id="close-logs" aria-label="Zavřít logy">✕</button></div></div><p class="muted">Posledních 200 řádků, nejvýše 128 KiB. Obnovují se každé 3 sekundy.</p><pre id="logs-content"></pre></dialog>
+  <div id="notice" role="status" hidden></div>
+</body>
+</html>
+
